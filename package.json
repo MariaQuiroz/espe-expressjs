@@ -1,28 +1,26 @@
 {
-  "name": "espe-expressjs",
+  "name": "espe-farmacia",
   "version": "1.0.0",
-  "description": "Clase de expressjs",
-  "main": "index.js",
+  "description": "API REST híbrida PostgreSQL + MongoDB para una farmacia",
+  "main": "src/server.js",
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy"
   },
-  "keywords": [],
-  "author": "Paulo Galarza",
   "license": "ISC",
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "bcryptjs": "^3.0.3",
-    "body-parser": "^2.3.0",
     "dotenv": "^18.0.8",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "9.11.4",
     "pg": "^8.23.1",
-    "slugify": "1.6.9",
-    "validator": "13.15.35"
+    "slugify": "1.6.9"
   },
   "devDependencies": {
     "prisma": "^7.10.1"

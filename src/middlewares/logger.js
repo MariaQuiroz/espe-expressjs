@@ -1,12 +1,11 @@
-const LoggerMiddleware = (req, res, next) => {
-  const timestamp = new Date().toISOString();
-  console.log(`[${timestamp} ${req.method} ${req.url} - IP: ${req.ip}]`);
-  const start = Date.now();
+const logger = (req, res, next) => {
+  const inicio = Date.now();
   res.on("finish", () => {
-    const duration = Date.now() - start;
-    console.log(`[${timestamp}] Response: ${res.statusCode} - ${duration}ms`);
+    console.log(
+      `${new Date().toISOString()} ${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - inicio}ms`,
+    );
   });
   next();
 };
 
-module.exports = LoggerMiddleware;
+module.exports = logger;

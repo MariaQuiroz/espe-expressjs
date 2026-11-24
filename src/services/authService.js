@@ -1,39 +1,43 @@
-const { PrismaClient } = require("@prisma/client");
-const { PrismaPg } = require("@prisma/adapter-pg");
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const prisma = require("../db/prisma");
+const HttpError = require("../utils/httpError");
 
-const registerUser = async (email, password, name) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = await prisma.user.create({
+const registrar = async ({ name, email, password }) => {
+  if (!name || !email || !password) {
+    throw new HttpError(400, "name, email y password son obligatorios");
+  }
+  if (String(password).length < 6) {
+    throw new HttpError(400, "La contraseña debe tener al menos 6 caracteres");
+  }
+  const existente = await prisma.user.findUnique({ where: { email } });
+  if (existente) throw new HttpError(409, "El correo ya está registrado");
+
+  const user = await prisma.user.create({
     data: {
-      email,
-      password: hashedPassword,
       name,
+      email,
+      password: await bcrypt.hash(password, 10),
       role: "USER",
     },
   });
-  return newUser;
+  return { id: user.id, name: user.name, email: user.email, role: user.role };
 };
 
-const loginUser = async (email, password) => {
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    throw new Error("Invalid email or password");
+const login = async ({ email, password }) => {
+  if (!email || !password) {
+    throw new HttpError(400, "email y password son obligatorios");
   }
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) {
-    throw new Error("Invalid email or password");
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    throw new HttpError(401, "Credenciales inválidas");
   }
   const token = jwt.sign(
-    { id: user.id, role: user.role },
+    { id: user.id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: "4h" },
+    { expiresIn: "2h" },
   );
-  return token;
+  return { token };
 };
 
-module.exports = { registerUser, loginUser };
+module.exports = { registrar, login };

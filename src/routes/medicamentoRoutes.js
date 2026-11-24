@@ -1,0 +1,13 @@
+const { Router } = require("express");
+const controller = require("../controllers/medicamentoController");
+const authenticateToken = require("../middlewares/auth");
+
+const router = Router();
+
+router.get("/", controller.listar);
+router.get("/:id", controller.obtener);
+router.post("/", authenticateToken, controller.crear);
+router.put("/:id", authenticateToken, controller.actualizar);
+router.delete("/:id", authenticateToken, controller.eliminar);
+
+module.exports = router;

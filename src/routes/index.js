@@ -1,16 +1,11 @@
 const { Router } = require("express");
-const authRouter = require("./auth");
-const adminRouter = require("./admin");
-const reservations = require("./reservations");
-const appointments = require("./appointments");
-const specialities = require("./specialties");
 
 const router = Router();
 
-router.use("/auth", authRouter);
-router.use("/admin", adminRouter);
-router.use("/specialties", specialities);
-router.use("/reservations", reservations);
-router.use("/users", appointments);
+router.use("/auth", require("./authRoutes"));
+router.use("/medicamentos", require("./medicamentoRoutes"));
+router.use("/stock", require("./stockRoutes"));
+router.use("/ventas", require("./ventaRoutes"));
+router.use("/reportes", require("./reporteRoutes"));
 
 module.exports = router;
